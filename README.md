@@ -6,7 +6,7 @@ kex is a pod exec utility.
 
 ```
 USAGE:
-  kex             : list the available pods
+  kex             : exec in to the default pod
   kex ls,list     : list the available pods
   kex <NUM>       : exec into a specified pod
   kex -h,--help   : show this message
