@@ -37,11 +37,12 @@ root@livewell-frontend-3514659123-wm77l:/app#
 
 **For macOS:**
 
-TODO: kex in Homebrew!
-
-> Use the [Homebrew](https://brew.sh/) package manager:
->
->     brew install kex
+Use the [Homebrew](https://brew.sh/) package manager:
+```sh
+brew tap farmotive/k8s
+brew install kex
+```
+See [farmotive homebrew k8s install section](https://github.com/farmotive/homebrew-k8s#install) for more options.
 
 **Other platforms:**
 
