@@ -1,78 +1,87 @@
 #!/bin/bash
 #
-# kex is a utility to quickly exec into a kubernetes pod.
+# See usage().
 
 [[ -n $DEBUG ]] && set -x
 
 set -eou pipefail
 IFS=$'\n\t'
 
+# We do this so the called script name variable is avilable in utility functions
+# below, in case of name change, brew alias, etc.
+SCRIPT=`basename ${BASH_SOURCE[0]}`
+
 usage() {
-  cat <<"EOF"
-USAGE:
-  kex             : exec in to the first listed pod
-  kex -ls,--list  : list the available pods
-  kex <NUM>       : exec into a specified pod
-  kex -h,--help   : show this message
+  cat <<EOF
+${SCRIPT}(1)
+
+NAME
+    ${SCRIPT} - Quick k8s pod exec utility.
+
+REQUIRES
+    kubectl(1)
+
+SYNOPSIS
+    ${SCRIPT} [-n <NUMBER>|1] [-c <COMMAND>|bash] [OPTIONS]
+
+DESCRIPTION
+    ${SCRIPT} is a quick kubernetes (k8s) utility to exec into a pod.
+
+OPTIONS
+    -l, --list
+        List available pods
+    -n, --number
+        Specify the pod number in the list to exec into. Default to "1"
+    -c, --command
+        Specify an alternative exec command. Defaults to "bash"
+    -h, --help
+        Show this help message
+
+SEE ALSO
+    kubectx(1), kubens(1)
 EOF
 }
 
-POD_NUM=${POD_NUM:-1}
-
-pod_def(){
-  kubectl get pods -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}' | nl
-  exit 0
+po_list() {
+  kubectl get pods -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}'
 }
 
-pod_default(){
-  kubectl get pods -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}' | sed -n 1p
+po_number_list() {
+  po_list | nl
 }
 
-kube_def_bash(){
-  kubectl exec -it $(pod_default) bash
+po_select() {
+  po_list | sed -n ${NUMBER:-1}p
 }
 
-# Placeholder for next version when bash isn't present in the container image.
-# kube_def_sh(){
-#   kubectl exec -it $(pod_default) sh
-# }
-
-pod_select(){
-  kubectl get pods -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}' | sed -n ${POD_NUM}p
+po_exec() {
+  kubectl exec -it $(po_select) ${COMMAND:-bash}
 }
 
-# Placeholder for next version when bash isn't present in the container image.
-# kube_exec_sh() {
-#   kubectl exec -it $(pod_select) sh
-# }
+# Transform long options to short ones. Sick trick.
+# http://stackoverflow.com/a/30026641/4096495
+for arg in "$@"; do
+  shift
+  case "$arg" in
+    "--list")     set -- "$@" "-l" ;;
+    "--number")   set -- "$@" "-n" ;;
+    "--command")  set -- "$@" "-c" ;;
+    "--help")     set -- "$@" "-h" ;;
+    *)            set -- "$@" "$arg"
+  esac
+done
 
-kube_exec_bash() {
-  kubectl exec -it $(pod_select) bash
-}
+while getopts :lhn:c: OPT; do
+  case $OPT in
+    l ) po_number_list; exit 0;;
+    n ) NUMBER=$OPTARG;;
+    c ) COMMAND=$OPTARG;;
+    h ) usage; exit 0;;
+    \?) echo "Unknown option: -$OPTARG" >&2; exit 1;;
+    : ) echo "Missing option argument for -$OPTARG" >&2; exit 1;;
+  esac
+done
+shift $((OPTIND-1))
 
-main() {
-  if [[ "$#" -eq 0 ]]; then
-    kube_def_bash
-  elif [[ "$#" -gt 1 ]]; then
-    echo "error: too many flags" >&2
-    usage
-    exit 1
-  elif [[ "$#" -eq 1 ]]; then
-    if [[ "${1}" == '-h' || "${1}" == '--help' ]]; then
-      usage
-      exit 0
-    elif [[ "${1}" == '-ls' || "${1}" == '--list' ]]; then
-      pod_def
-    elif [[ "${1}" =~ ^-(.*) ]]; then
-      echo "error: unrecognized flag \"${1}\"" >&2
-      usage
-      exit 1
-    fi
-    if [[ "${1}" ]]; then
-      POD_NUM=${1}
-    kube_exec_bash
-    fi
-  fi
-}
-
-main "$@"
+# If we get past validation without exiting, exec.
+po_exec

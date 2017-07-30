@@ -1,21 +1,42 @@
-The purpose of kex is to provide an opinionated executor into a kubernetes container.  Traditionally, if one wanted to exec into a kubernetes container, one had to `kubectl get pods --namespace foo`, visually identify the pod of interest, copy that pod to the buffer, and then `kubectl --namespace foo exec -it <paste_buffer> bash` to exec in to the pod.  This simple utility aims to provide a namespace-specific pod selector for quick execution.
+The purpose of kex is to provide an opinionated executor into a kubernetes container.  Traditionally, if one wanted to exec into a kubernetes container, one had to `kubectl get pods --namespace foo`, visually identify the pod of interest, copy that pod to the buffer, and then `kubectl --namespace foo exec -it <paste_buffer> bash` to exec into the pod.  This simple utility aims to provide a namespace-specific pod selector for quick execution.
 
 # kex
 
-kex is a pod exec utility.
+kex(1)
 
-```
-USAGE:
-  kex ls,list     : list the available pods
-  kex             : exec in to the first listed pod
-  kex <NUM>       : exec into a specified pod
-  kex -h,--help   : show this message
-```
+NAME
+    kex - Quick k8s pod exec utility.
+
+REQUIRES
+    kubectl(1)
+
+SYNOPSIS
+    kex [-n <NUMBER>|1] [-c <COMMAND>|bash] [OPTIONS]
+
+DESCRIPTION
+    kex is a quick kubernetes (k8s) utility to exec into a pod.
+
+OPTIONS
+
+    -l, --list
+        List available pods
+
+    -n, --number
+        Specify the pod number in the list to exec into. Default to "1"
+
+    -c, --command
+        Specify an alternative exec command. Defaults to "bash"
+
+    -h, --help
+        Show this help message
+
+SEE ALSO
+    kubectx(1), kubens(1)
 
 ### USAGE
 
 ```sh
-$ kex ls
+$ kex -l
 1           365bass-dt1nb
 2           esp-echo-546159305-mh4gq
 3           livewell-frontend-3514659123-hq60x
@@ -29,8 +50,11 @@ $ kex ls
 $ kex
 root@365bass-dt1nb:/#
 
-$ kex 5
+$ kex -n 5
 root@livewell-frontend-3514659123-wm77l:/app#
+
+$ kex -n 9 -c uname
+Linux
 ```
 
 ## Installation
