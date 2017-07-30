@@ -1,4 +1,4 @@
-The purpose of kex is to provide an opinionated executor into a kubernetes container.  Traditionally, if one wanted to exec into a kubernetes container, one had to `kubectl get pods --namespace foo`, visually identify the pod of interest, copy that pod to the buffer, and then `kubectl --namespace foo exec -it <paste_buffer> bash` to exec in to the pod.  This simple utility aims to provide a namespace-specific pod selector for quick execution.
+The purpose of kex is to provide an opinionated executor into a kubernetes container.  Traditionally, if one wanted to exec into a kubernetes container, one had to `kubectl get pods --namespace foo`, visually identify the pod of interest, copy that pod to the buffer, and then `kubectl --namespace foo exec -it <paste_buffer> bash` to exec into the pod.  This simple utility aims to provide a namespace-specific pod selector for quick execution.
 
 # kex
 
@@ -26,7 +26,7 @@ OPTIONS
 
     -c, --command
         Specify an alternative exec command. Defaults to "bash"
-        
+
     -h, --help
         Show this help message
 
