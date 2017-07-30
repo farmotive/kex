@@ -16,7 +16,6 @@ USAGE:
 
 ```sh
 $ kex ls
-SELECTOR    NAME
 1           365bass-dt1nb
 2           esp-echo-546159305-mh4gq
 3           livewell-frontend-3514659123-hq60x
