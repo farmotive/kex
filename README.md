@@ -17,12 +17,16 @@ DESCRIPTION
     kex is a quick kubernetes (k8s) utility to exec into a pod.
 
 OPTIONS
+
     -l, --list
         List available pods
+
     -n, --number
         Specify the pod number in the list to exec into. Default to "1"
+
     -c, --command
         Specify an alternative exec command. Defaults to "bash"
+        
     -h, --help
         Show this help message
 
