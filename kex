@@ -22,39 +22,46 @@ usage() {
   cat <<"EOF"
 USAGE:
   kex             : exec in to the first listed pod
-  kex ls,list     : list the available pods
+  kex -ls,--list     : list the available pods
   kex <NUM>       : exec into a specified pod
   kex -h,--help   : show this message
 EOF
   exit 1
 }
 
+POD_NUM=${POD_NUM:-1}
+
+pod_select(){
+  kubectl get pods -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}' | sed -n ${POD_NUM}p
+}
+
+kube_exec_sh() {
+  kubectl exec -it $(pod_select) sh
+}
+
+kube_exec_bash() {
+  kubectl exec -it $(pod_select) bash
+}
+
 main() {
   if [[ "$#" -eq 0 ]]; then
-    if kube_def_bash ; then
-      kube_def_bash
-    else
-      kube_def_sh
-    fi
+    kube_def_bash
   elif [[ "$#" -gt 1 ]]; then
     echo "error: too many flags" >&2
     usage
   elif [[ "$#" -eq 1 ]]; then
-    if kube_exec_bash ; then
-      kube_exec_bash
-    else
-      kube_exec_sh
-    fi
-    elif [[ "${1}" == '-h' || "${1}" == '--help' ]]; then
+    if [[ "${1}" == '-h' || "${1}" == '--help' ]]; then
       usage
+    elif [[ "${1}" == '-ls' || "${1}" == '--list' ]]; then
+      pod_def
     elif [[ "${1}" =~ ^-(.*) ]]; then
       echo "error: unrecognized flag \"${1}\"" >&2
       usage
-    elif [[ "${1}" == 'ls' || "${1}" == 'list' ]]; then
-      pod_def
     fi
-  else
-    usage
+    if [[ "${1}" ]]; then
+      POD_NUM=${1}
+    kube_exec_bash
+    fi
   fi
 }
 
