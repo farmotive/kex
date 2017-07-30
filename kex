@@ -42,20 +42,20 @@ SEE ALSO
 EOF
 }
 
-po_get() {
+po_list() {
   kubectl get pods -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}'
 }
 
-po_list() {
-  po_get | nl
+po_number_list() {
+  po_list | nl
 }
 
-po_extract() {
-  po_get | sed -n ${NUMBER:-1}p
+po_select() {
+  po_list | sed -n ${NUMBER:-1}p
 }
 
 po_exec() {
-  kubectl exec -it $(po_extract) ${COMMAND:-bash}
+  kubectl exec -it $(po_select) ${COMMAND:-bash}
 }
 
 # Transform long options to short ones. Sick trick.
@@ -73,7 +73,7 @@ done
 
 while getopts :lhn:c: OPT; do
   case $OPT in
-    l ) po_list; exit 0;;
+    l ) po_number_list; exit 0;;
     n ) NUMBER=$OPTARG;;
     c ) COMMAND=$OPTARG;;
     h ) usage; exit 0;;
