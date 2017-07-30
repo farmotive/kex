@@ -1,0 +1,61 @@
+#!/bin/bash
+#
+# kex is a utility to quickly exec into a kubernetes pod.
+
+[[ -n $DEBUG ]] && set -x
+
+set -eou pipefail
+IFS=$'\n\t'
+
+SCRIPT_DIR="$(dirname "$( readlink -f "${0}" 2>/dev/null || \
+  python -c "import os,sys; print(os.path.realpath(sys.argv[1]))" "${0}" )")"
+
+if [[ -f "${SCRIPT_DIR}/utils.bash" ]]; then
+  source "${SCRIPT_DIR}/utils.bash"
+else
+  source "${SCRIPT_DIR}/../include/utils.bash"
+fi
+
+KEX="${HOME}/.kube/kex"
+
+usage() {
+  cat <<"EOF"
+USAGE:
+  kex             : exec in to the first listed pod
+  kex ls,list     : list the available pods
+  kex <NUM>       : exec into a specified pod
+  kex -h,--help   : show this message
+EOF
+  exit 1
+}
+
+main() {
+  if [[ "$#" -eq 0 ]]; then
+    if kube_def_bash ; then
+      kube_def_bash
+    else
+      kube_def_sh
+    fi
+  elif [[ "$#" -gt 1 ]]; then
+    echo "error: too many flags" >&2
+    usage
+  elif [[ "$#" -eq 1 ]]; then
+    if kube_exec_bash ; then
+      kube_exec_bash
+    else
+      kube_exec_sh
+    fi
+    elif [[ "${1}" == '-h' || "${1}" == '--help' ]]; then
+      usage
+    elif [[ "${1}" =~ ^-(.*) ]]; then
+      echo "error: unrecognized flag \"${1}\"" >&2
+      usage
+    elif [[ "${1}" == 'ls' || "${1}" == 'list' ]]; then
+      pod_def
+    fi
+  else
+    usage
+  fi
+}
+
+main "$@"
