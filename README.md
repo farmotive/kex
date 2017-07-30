@@ -66,6 +66,11 @@ Use the [Homebrew](https://brew.sh/) package manager:
 brew tap farmotive/k8s
 brew install kex
 ```
+**NOTE:** If using gcloud sdk to manage the installation and versioning of `kubectl`, install with the `--without-kubernetes-cli` flag to omit the brew dependency:
+```sh
+brew install kex --without-kubernetes-cli
+```
+
 See [farmotive homebrew k8s install section](https://github.com/farmotive/homebrew-k8s#install) for more options.
 
 **Other platforms:**
