@@ -6,8 +6,8 @@ kex is a pod exec utility.
 
 ```
 USAGE:
-  kex             : exec in to the default pod
   kex ls,list     : list the available pods
+  kex             : exec in to the first listed pod
   kex <NUM>       : exec into a specified pod
   kex -h,--help   : show this message
 ```
@@ -16,16 +16,15 @@ USAGE:
 
 ```sh
 $ kex ls
-NAME                                      SELECTOR
-365bass-dt1nb                             1 [default]
-esp-echo-546159305-mh4gq                  2
-livewell-frontend-3514659123-hq60x        3
-livewell-frontend-3514659123-jqdrq        4
-livewell-frontend-3514659123-wm77l        5
-livewell-redis-3260658712-rstr5           6
-livewell-worker-715121025-7k6s9           7
-livewell-worker-715121025-z90zs           8
-minecraft-1545301362-rf1s5                9
+1           365bass-dt1nb
+2           esp-echo-546159305-mh4gq
+3           livewell-frontend-3514659123-hq60x
+4           livewell-frontend-3514659123-jqdrq
+5           livewell-frontend-3514659123-wm77l
+6           livewell-redis-3260658712-rstr5
+7           livewell-worker-715121025-7k6s9
+8           livewell-worker-715121025-z90zs
+9           minecraft-1545301362-rf1s5
 
 $ kex
 root@365bass-dt1nb:/#
@@ -43,15 +42,12 @@ TODO: kex in Homebrew!
 > Use the [Homebrew](https://brew.sh/) package manager:
 >
 >     brew install kex
->
-> this will also set up bash/zsh completion scripts automatically.
 
 **Other platforms:**
 
 - Download the `kex` script
 - Add it somewhere in your PATH
 - Make it executable (`chmod +x`)
-- You can also install bash/zsh [completion scripts](completion/) manually.
 
 -----
 
