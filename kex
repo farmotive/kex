@@ -30,8 +30,10 @@ DESCRIPTION
 OPTIONS
     -l, --list
         List available pods
-    -n, --number
+    -p, --number
         Specify the pod number in the list to exec into. Default to "1"
+    -n, --namespace
+        Specify pod namespace
     -c, --command
         Specify an alternative exec command. Defaults to "bash"
     -h, --help
@@ -43,7 +45,10 @@ EOF
 }
 
 po_list() {
-  kubectl get pods -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}'
+  local NS_PARAM="--namespace=${NAMESPACE:-}"
+  kubectl ${NAMESPACE:+$NS_PARAM} \
+      get pods \
+      -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}'
 }
 
 po_number_list() {
@@ -55,7 +60,9 @@ po_select() {
 }
 
 po_exec() {
-  kubectl exec -it $(po_select) ${COMMAND:-bash}
+  local NS_PARAM="--namespace=${NAMESPACE:-}"
+  kubectl ${NAMESPACE:+$NS_PARAM} \
+    exec -it $(po_select) ${COMMAND:-bash}
 }
 
 # Transform long options to short ones. Sick trick.
@@ -63,18 +70,20 @@ po_exec() {
 for arg in "$@"; do
   shift
   case "$arg" in
-    "--list")     set -- "$@" "-l" ;;
-    "--number")   set -- "$@" "-n" ;;
-    "--command")  set -- "$@" "-c" ;;
-    "--help")     set -- "$@" "-h" ;;
-    *)            set -- "$@" "$arg"
+    "--list")       set -- "$@" "-l" ;;
+    "--namespace")  set -- "$@" "-n" ;;
+    "--number")     set -- "$@" "-p" ;;
+    "--command")    set -- "$@" "-c" ;;
+    "--help")       set -- "$@" "-h" ;;
+    *)              set -- "$@" "$arg"
   esac
 done
 
 while getopts :lhn:c: OPT; do
   case $OPT in
     l ) po_number_list; exit 0;;
-    n ) NUMBER=$OPTARG;;
+    n ) NAMESPACE=$OPTARG;;
+    p ) NUMBER=$OPTARG;;
     c ) COMMAND=$OPTARG;;
     h ) usage; exit 0;;
     \?) echo "Unknown option: -$OPTARG" >&2; exit 1;;

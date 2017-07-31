@@ -21,9 +21,12 @@ OPTIONS
     -l, --list
         List available pods
 
-    -n, --number
+    -p, --number
         Specify the pod number in the list to exec into. Default to "1"
-
+        
+    -n, --namespace
+        Specify pod namespace
+        
     -c, --command
         Specify an alternative exec command. Defaults to "bash"
 
@@ -50,10 +53,10 @@ $ kex -l
 $ kex
 root@365bass-dt1nb:/#
 
-$ kex -n 5
+$ kex -p 5
 root@livewell-frontend-3514659123-wm77l:/app#
 
-$ kex -n 9 -c uname
+$ kex -p 9 -c uname
 Linux
 ```
 
