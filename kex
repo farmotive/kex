@@ -22,7 +22,7 @@ REQUIRES
     kubectl(1)
 
 SYNOPSIS
-    ${SCRIPT} [-n <NUMBER>|1] [-c <COMMAND>|bash] [OPTIONS]
+    ${SCRIPT} [-p <POD>|1] [-c <COMMAND>|bash] [-n <NAMESPACE>] [OPTIONS]
 
 DESCRIPTION
     ${SCRIPT} is a quick kubernetes (k8s) utility to exec into a pod.
@@ -30,8 +30,10 @@ DESCRIPTION
 OPTIONS
     -l, --list
         List available pods
-    -n, --number
+    -p, --pod
         Specify the pod number in the list to exec into. Default to "1"
+    -n, --namespace
+        Specify pod namespace. Default current namespace. See kubens(1)
     -c, --command
         Specify an alternative exec command. Defaults to "bash"
     -h, --help
@@ -43,7 +45,9 @@ EOF
 }
 
 po_list() {
-  kubectl get pods -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}'
+  kubectl ${NS_PARAM:-} \
+    get pods \
+    -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}'
 }
 
 po_number_list() {
@@ -51,11 +55,12 @@ po_number_list() {
 }
 
 po_select() {
-  po_list | sed -n ${NUMBER:-1}p
+  po_list | sed -n ${POD:-1}p
 }
 
 po_exec() {
-  kubectl exec -it $(po_select) ${COMMAND:-bash}
+  kubectl ${NS_PARAM:-} \
+    exec -it $(po_select) ${COMMAND:-bash}
 }
 
 # Transform long options to short ones. Sick trick.
@@ -63,25 +68,39 @@ po_exec() {
 for arg in "$@"; do
   shift
   case "$arg" in
-    "--list")     set -- "$@" "-l" ;;
-    "--number")   set -- "$@" "-n" ;;
-    "--command")  set -- "$@" "-c" ;;
-    "--help")     set -- "$@" "-h" ;;
-    *)            set -- "$@" "$arg"
+    "--list")       set -- "$@" "-l" ;;
+    "--namespace")  set -- "$@" "-n" ;;
+    "--pod")        set -- "$@" "-p" ;;
+    "--command")    set -- "$@" "-c" ;;
+    "--help")       set -- "$@" "-h" ;;
+    *)              set -- "$@" "$arg"
   esac
 done
 
-while getopts :lhn:c: OPT; do
+while getopts :lhn:p:c: OPT; do
   case $OPT in
-    l ) po_number_list; exit 0;;
-    n ) NUMBER=$OPTARG;;
+    l ) LIST=true;;
+    n ) NAMESPACE=$OPTARG;;
+    p ) POD=$OPTARG;;
     c ) COMMAND=$OPTARG;;
-    h ) usage; exit 0;;
+    h ) HELP=true;;
     \?) echo "Unknown option: -$OPTARG" >&2; exit 1;;
     : ) echo "Missing option argument for -$OPTARG" >&2; exit 1;;
   esac
 done
 shift $((OPTIND-1))
 
-# If we get past validation without exiting, exec.
-po_exec
+# Set ns first for use in any function.
+if [[ ! -z ${NAMESPACE:-} ]]; then
+  NS_PARAM="--namespace=$NAMESPACE"
+fi
+
+# Usage, list, and exec should not happen simultaneously, so elif.
+if [[ ${HELP:-} == 'true' ]]; then
+  usage; exit 0
+elif [[ ${LIST:-} == 'true' ]]; then
+  po_number_list; exit 0
+else
+  # If we get this far, exec.
+  po_exec
+fi

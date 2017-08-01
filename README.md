@@ -2,6 +2,7 @@ The purpose of kex is to provide an opinionated executor into a kubernetes conta
 
 # kex
 
+```sh
 kex(1)
 
 NAME
@@ -17,21 +18,20 @@ DESCRIPTION
     kex is a quick kubernetes (k8s) utility to exec into a pod.
 
 OPTIONS
-
     -l, --list
         List available pods
-
-    -n, --number
+    -p, --pod
         Specify the pod number in the list to exec into. Default to "1"
-
+    -n, --namespace
+        Specify pod namespace. Default current namespace. See kubens(1)
     -c, --command
         Specify an alternative exec command. Defaults to "bash"
-
     -h, --help
         Show this help message
 
 SEE ALSO
     kubectx(1), kubens(1)
+```
 
 ### USAGE
 
@@ -50,10 +50,10 @@ $ kex -l
 $ kex
 root@365bass-dt1nb:/#
 
-$ kex -n 5
+$ kex -p 5
 root@livewell-frontend-3514659123-wm77l:/app#
 
-$ kex -n 9 -c uname
+$ kex -p 9 -c uname
 Linux
 ```
 
