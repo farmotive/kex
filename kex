@@ -44,20 +44,34 @@ SEE ALSO
 EOF
 }
 
-current_namespace() {
+ns_current() {
   # Borrowed partly from kubens current_namespace().
   cur_ctx=$(kubectl config current-context)
-  ns="$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"${cur_ctx}\")].context.namespace}")"
-  if [[ -z "${ns}" ]]; then
-    echo "default"
-  else
-    echo "${ns}"
-  fi
+  echo "$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"${cur_ctx}\")].context.namespace}")"
 }
 
 ns_param() {
-  if [[ ! -z ${NAMESPACE:-} ]]; then
-    echo "--namespace=$NAMESPACE"
+  local ns=$(ns_select)
+  if [[ ! -z ${ns:-} ]]; then
+    echo "--namespace=${ns}"
+  fi
+}
+
+ns_list() {
+  kubectl get namespaces -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}'
+}
+
+ns_number_list() {
+  ns_list | nl
+}
+
+ns_select() {
+  if [[ ! -z ${NS:-} ]]; then
+    ns_list | sed -n ${NS}p
+  elif [[ ! -z ${NAMESPACE:-} ]]; then
+    echo $NAMESPACE
+  else
+    ns_current
   fi
 }
 
@@ -113,8 +127,8 @@ if [[ ${HELP:-} == 'true' ]]; then
 elif [[ ${LIST:-} == 'true' ]]; then
   po_number_list; exit 0
 else
-  NS=$(current_namespace);
-  echo "Namespace? (default $NS):"; read NAMESPACE;
+  ns=$(ns_current)
+  echo "Namespace? (default ${ns:-default}):"; ns_number_list; read NS;
   echo 'Pod number? (default 1):'; po_number_list; read POD;
   echo 'Command? (default bash)'; read COMMAND;
   po_exec
