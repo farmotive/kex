@@ -101,6 +101,8 @@ if [[ ${HELP:-} == 'true' ]]; then
 elif [[ ${LIST:-} == 'true' ]]; then
   po_number_list; exit 0
 else
-  # If we get this far, exec.
+  echo 'Select a pod number (default 1):';
+  po_number_list;
+  read POD;
   po_exec
 fi
