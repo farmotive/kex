@@ -14,20 +14,14 @@ REQUIRES
     kubectl(1)
 
 SYNOPSIS
-    kex [-n <NUMBER>|1] [-c <COMMAND>|bash] [OPTIONS]
+    kex [OPTIONS]
 
 DESCRIPTION
-    kex is a quick kubernetes (k8s) utility to exec into a pod.
+    kex is a quick kubernetes (k8s) utility to exec into a pod. kex prompts for <NAMESPACE> (defaults to current ns - See kubens(1)), <POD> (defaults to "1") and <COMMAND> (defaults to bash).
 
 OPTIONS
     -l, --list
-        List available pods
-    -p, --pod
-        Specify the pod number in the list to exec into. Default to "1"
-    -n, --namespace
-        Specify pod namespace. Default current namespace. See kubens(1)
-    -c, --command
-        Specify an alternative exec command. Defaults to "bash"
+        List available pods without performing exec.
     -h, --help
         Show this help message
 
@@ -39,24 +33,22 @@ SEE ALSO
 
 ```sh
 $ kex -l
-1           365bass-dt1nb
-2           esp-echo-546159305-mh4gq
-3           livewell-frontend-3514659123-hq60x
-4           livewell-frontend-3514659123-jqdrq
-5           livewell-frontend-3514659123-wm77l
-6           livewell-redis-3260658712-rstr5
-7           livewell-worker-715121025-7k6s9
-8           livewell-worker-715121025-z90zs
-9           minecraft-1545301362-rf1s5
+    1 foo-drupal
+    2 bar-mariadb
+    3 baz-alpine
 
 $ kex
-root@365bass-dt1nb:/#
+Namespace? (default qux):
+Pod number? (default 1):
+    1 foo-drupal
+    2 bar-mariadb
+    3 baz-alpine
+2
+Command? (default bash)
+mysql
 
-$ kex -p 5
-root@livewell-frontend-3514659123-wm77l:/app#
-
-$ kex -p 9 -c uname
-Linux
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+MariaDB [NAME]>
 ```
 
 ## Installation

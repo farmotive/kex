@@ -22,20 +22,14 @@ REQUIRES
     kubectl(1)
 
 SYNOPSIS
-    ${SCRIPT} [-p <POD>|1] [-c <COMMAND>|bash] [-n <NAMESPACE>] [OPTIONS]
+    ${SCRIPT} [OPTIONS]
 
 DESCRIPTION
-    ${SCRIPT} is a quick kubernetes (k8s) utility to exec into a pod.
+    ${SCRIPT} is a quick kubernetes (k8s) utility to exec into a pod. ${SCRIPT} prompts for <NAMESPACE> (defaults to current ns - See kubens(1)), <POD> (defaults to "1") and <COMMAND> (defaults to bash).
 
 OPTIONS
     -l, --list
-        List available pods
-    -p, --pod
-        Specify the pod number in the list to exec into. Default to "1"
-    -n, --namespace
-        Specify pod namespace. Default current namespace. See kubens(1)
-    -c, --command
-        Specify an alternative exec command. Defaults to "bash"
+        List available pods without performing exec.
     -h, --help
         Show this help message
 
