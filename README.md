@@ -2,7 +2,7 @@ The purpose of kex is to provide an opinionated executor into a kubernetes conta
 
 # kex
 
-[![asciicast](https://asciinema.org/a/vmtoBuXHoxktIqRKY3B6To9aF.png)](https://asciinema.org/a/vmtoBuXHoxktIqRKY3B6To9aF)
+[![asciicast](https://asciinema.org/a/ZhQnEk0ASI7GgTOuEXLGpWnn9.png)](https://asciinema.org/a/ZhQnEk0ASI7GgTOuEXLGpWnn9)
 
 ```sh
 kex(1)
@@ -17,11 +17,13 @@ SYNOPSIS
     kex [OPTIONS]
 
 DESCRIPTION
-    kex is a quick kubernetes (k8s) utility to exec into a pod. kex prompts for <NAMESPACE> (defaults to current ns - See kubens(1)), <POD> (defaults to "1") and <COMMAND> (defaults to bash).
+    kex is a quick kubernetes (k8s) utility to exec into a pod. kex prompts for:
+    - <NAMESPACE> (defaults to current ns. See kubens(1))
+    - <POD> (defaults to "1")
+    - <COMMAND> (defaults to bash)
+  ENTER to use defaults.
 
 OPTIONS
-    -l, --list
-        List available pods without performing exec.
     -h, --help
         Show this help message
 
@@ -32,13 +34,20 @@ SEE ALSO
 ### USAGE
 
 ```sh
-$ kex -l
-    1 foo-drupal
-    2 bar-mariadb
-    3 baz-alpine
-
 $ kex
 Namespace? (default qux):
+    1 qux
+    2 quux
+    3 quuz
+    4 corge
+    5 grault
+    6 garply
+    7 waldo
+    8 fred
+    9 plugh
+    10 xyzzy
+    11 thud
+4
 Pod number? (default 1):
     1 foo-drupal
     2 bar-mariadb
