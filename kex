@@ -25,11 +25,13 @@ SYNOPSIS
     ${SCRIPT} [OPTIONS]
 
 DESCRIPTION
-    ${SCRIPT} is a quick kubernetes (k8s) utility to exec into a pod. ${SCRIPT} prompts for <NAMESPACE> (defaults to current ns - See kubens(1)), <POD> (defaults to "1") and <COMMAND> (defaults to bash).
+    ${SCRIPT} is a quick kubernetes (k8s) utility to exec into a pod. ${SCRIPT} prompts for:
+      - <NAMESPACE> (defaults to current ns. See kubens(1))
+      - <POD> (defaults to "1")
+      - <COMMAND> (defaults to bash)
+    ENTER to use defaults.
 
 OPTIONS
-    -l, --list
-        List available pods without performing exec.
     -h, --help
         Show this help message
 
@@ -93,21 +95,13 @@ po_exec() {
 for arg in "$@"; do
   shift
   case "$arg" in
-    "--list")       set -- "$@" "-l" ;;
-    "--namespace")  set -- "$@" "-n" ;;
-    "--pod")        set -- "$@" "-p" ;;
-    "--command")    set -- "$@" "-c" ;;
     "--help")       set -- "$@" "-h" ;;
     *)              set -- "$@" "$arg"
   esac
 done
 
-while getopts :lhn:p:c: OPT; do
+while getopts :h OPT; do
   case $OPT in
-    l ) LIST=true;;
-    n ) NAMESPACE=$OPTARG;;
-    p ) POD=$OPTARG;;
-    c ) COMMAND=$OPTARG;;
     h ) HELP=true;;
     \?) echo "Unknown option: -$OPTARG" >&2; exit 1;;
     : ) echo "Missing option argument for -$OPTARG" >&2; exit 1;;
@@ -118,8 +112,6 @@ shift $((OPTIND-1))
 # Usage, list, and exec should not happen simultaneously, so elif.
 if [[ ${HELP:-} == 'true' ]]; then
   usage; exit 0
-elif [[ ${LIST:-} == 'true' ]]; then
-  po_number_list; exit 0
 else
   ns=$(ns_current)
   echo "Namespace? (default ${ns:-default}):"; ns_number_list; read NS;
