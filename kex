@@ -55,8 +55,14 @@ current_namespace() {
   fi
 }
 
+ns_param() {
+  if [[ ! -z ${NAMESPACE:-} ]]; then
+    echo "--namespace=$NAMESPACE"
+  fi
+}
+
 po_list() {
-  kubectl ${NS_PARAM:-} \
+  kubectl $(ns_param) \
     get pods \
     -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}'
 }
@@ -70,7 +76,7 @@ po_select() {
 }
 
 po_exec() {
-  kubectl ${NS_PARAM:-} \
+  kubectl $(ns_param) \
     exec -it $(po_select) ${COMMAND:-bash}
 }
 
@@ -100,11 +106,6 @@ while getopts :lhn:p:c: OPT; do
   esac
 done
 shift $((OPTIND-1))
-
-# Set ns first for use in any function.
-if [[ ! -z ${NAMESPACE:-} ]]; then
-  NS_PARAM="--namespace=$NAMESPACE"
-fi
 
 # Usage, list, and exec should not happen simultaneously, so elif.
 if [[ ${HELP:-} == 'true' ]]; then
