@@ -22,20 +22,14 @@ REQUIRES
     kubectl(1)
 
 SYNOPSIS
-    ${SCRIPT} [-p <POD>|1] [-c <COMMAND>|bash] [-n <NAMESPACE>] [OPTIONS]
+    ${SCRIPT} [OPTIONS]
 
 DESCRIPTION
-    ${SCRIPT} is a quick kubernetes (k8s) utility to exec into a pod.
+    ${SCRIPT} is a quick kubernetes (k8s) utility to exec into a pod. ${SCRIPT} prompts for <NAMESPACE> (defaults to current ns - See kubens(1)), <POD> (defaults to "1") and <COMMAND> (defaults to bash).
 
 OPTIONS
     -l, --list
-        List available pods
-    -p, --pod
-        Specify the pod number in the list to exec into. Default to "1"
-    -n, --namespace
-        Specify pod namespace. Default current namespace. See kubens(1)
-    -c, --command
-        Specify an alternative exec command. Defaults to "bash"
+        List available pods without performing exec.
     -h, --help
         Show this help message
 
@@ -44,8 +38,39 @@ SEE ALSO
 EOF
 }
 
+ns_current() {
+  # Borrowed partly from kubens current_namespace().
+  cur_ctx=$(kubectl config current-context)
+  echo "$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"${cur_ctx}\")].context.namespace}")"
+}
+
+ns_param() {
+  local ns=$(ns_select)
+  if [[ ! -z ${ns:-} ]]; then
+    echo "--namespace=${ns}"
+  fi
+}
+
+ns_list() {
+  kubectl get namespaces -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}'
+}
+
+ns_number_list() {
+  ns_list | nl
+}
+
+ns_select() {
+  if [[ ! -z ${NS:-} ]]; then
+    ns_list | sed -n ${NS}p
+  elif [[ ! -z ${NAMESPACE:-} ]]; then
+    echo $NAMESPACE
+  else
+    ns_current
+  fi
+}
+
 po_list() {
-  kubectl ${NS_PARAM:-} \
+  kubectl $(ns_param) \
     get pods \
     -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}'
 }
@@ -59,7 +84,7 @@ po_select() {
 }
 
 po_exec() {
-  kubectl ${NS_PARAM:-} \
+  kubectl $(ns_param) \
     exec -it $(po_select) ${COMMAND:-bash}
 }
 
@@ -90,17 +115,15 @@ while getopts :lhn:p:c: OPT; do
 done
 shift $((OPTIND-1))
 
-# Set ns first for use in any function.
-if [[ ! -z ${NAMESPACE:-} ]]; then
-  NS_PARAM="--namespace=$NAMESPACE"
-fi
-
 # Usage, list, and exec should not happen simultaneously, so elif.
 if [[ ${HELP:-} == 'true' ]]; then
   usage; exit 0
 elif [[ ${LIST:-} == 'true' ]]; then
   po_number_list; exit 0
 else
-  # If we get this far, exec.
+  ns=$(ns_current)
+  echo "Namespace? (default ${ns:-default}):"; ns_number_list; read NS;
+  echo 'Pod number? (default 1):'; po_number_list; read POD;
+  echo 'Command? (default bash)'; read COMMAND;
   po_exec
 fi
