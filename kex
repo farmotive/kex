@@ -79,8 +79,8 @@ po_list_state() {
 
 po_list() {
   kubectl $(ns_param) \
-     get pods \
-     -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}'
+  get pods \
+  -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}'
 }
 
 po_number_list() {
@@ -93,7 +93,7 @@ po_select() {
 
 po_exec() {
   kubectl $(ns_param) \
-    exec -it $(po_select) ${COMMAND:-bash}
+  exec -it $(po_select) ${COMMAND:-bash}
 }
 
 # Transform long options to short ones. Sick trick.
