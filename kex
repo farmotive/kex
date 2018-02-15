@@ -71,6 +71,12 @@ ns_select() {
   fi
 }
 
+po_list_state() {
+  names=($(kubectl $(ns_param) get pods -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}'))
+  states=($(kubectl $(ns_param) get pods -o=jsonpath='{range .items[*].status.phase}{@}{"\n"}{end}'))
+  for (( i=0; $i < ${#names[@]}; i+=1 )); do echo "${names[i]}: ${states[i]}"; done
+}
+
 po_list() {
   kubectl $(ns_param) \
     get pods \
@@ -78,7 +84,7 @@ po_list() {
 }
 
 po_number_list() {
-  po_list | nl
+  po_list_state | nl
 }
 
 po_select() {
