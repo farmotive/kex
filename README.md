@@ -2,7 +2,7 @@ The purpose of kex is to provide an opinionated executor into a kubernetes conta
 
 # kex
 
-[![asciicast](https://asciinema.org/a/ZhQnEk0ASI7GgTOuEXLGpWnn9.png)](https://asciinema.org/a/ZhQnEk0ASI7GgTOuEXLGpWnn9)
+[![asciicast](https://asciinema.org/a/OdKfqcN39sSTOkSSuFubFRl6z.png)](https://asciinema.org/a/OdKfqcN39sSTOkSSuFubFRl6z?t=21)
 
 ```sh
 kex(1)
@@ -49,9 +49,9 @@ Namespace? (default qux):
     11 thud
 4
 Pod number? (default 1):
-    1 foo-drupal
-    2 bar-mariadb
-    3 baz-alpine
+    1 foo-drupal: running
+    2 bar-mariadb: running
+    3 baz-alpine: pending
 2
 Command? (default bash)
 mysql
@@ -83,7 +83,5 @@ See [farmotive homebrew k8s install section](https://github.com/farmotive/homebr
 - Make it executable (`chmod +x`)
 
 -----
-
-Disclaimer: This is not an official Google product.
 
 Thanks to [ahmetb](https://github.com/ahmetb) for the inspiration!
