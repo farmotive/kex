@@ -1,4 +1,4 @@
-The purpose of kex is to provide an opinionated executor into a kubernetes container.  Traditionally, if one wanted to exec into a kubernetes container, one had to `kubectl get pods --namespace foo`, visually identify the pod of interest, copy that pod to the buffer, and then `kubectl --namespace foo exec -it <paste_buffer> bash` to exec into the pod.  This simple utility aims to provide a namespace-specific pod selector for quick execution.
+The purpose of kex is to provide an opinionated executor into a kubernetes container.  Traditionally, if one wanted to exec into a kubernetes container, one had to `kubectl get pods --namespace foo`, visually identify the pod of interest, copy that pod to the buffer, and then `kubectl --namespace foo exec -it <paste_buffer> bash` to exec into the pod.  Moreover, if the pod has n+1 containers, one had to identify the container of interest and pass this variable with the -c flag.  This simple utility aims to provide a namespace-specific pod selector for quick execution.
 
 # kex
 
@@ -20,6 +20,8 @@ DESCRIPTION
     kex is a quick kubernetes (k8s) utility to exec into a pod. kex prompts for:
     - <NAMESPACE> (defaults to current ns. See kubens(1))
     - <POD> (defaults to "1")
+    - <CONTAINER> (If the pod has only one container, this prompt is omitted, and the "COMAND" prompt is presented.  
+        If the pod has multiple containers, you will be prompted to select one.)
     - <COMMAND> (defaults to bash)
   ENTER to use defaults.
 
@@ -53,6 +55,10 @@ Pod number? (default 1):
     2 bar-mariadb: running
     3 baz-alpine: pending
 2
+Container number? (default 1):
+     1	mariadb
+     2	sidecar
+1
 Command? (default bash)
 mysql
 
