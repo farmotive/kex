@@ -96,6 +96,38 @@ po_exec() {
     exec -it $(po_select) ${COMMAND:-bash}
 }
 
+con_list() {
+  kubectl $(ns_param) \
+    get po $(po_select) \
+    -o=jsonpath='{..containers[*].name}' \
+    | tr " " "\n" \
+    | sort -u
+}
+
+con_number_list() {
+  con_list | nl
+}
+
+con_select() {
+  con_list | sed -n ${CON:-1}p
+}
+
+con_count() {
+  con_list | wc -w
+}
+
+co_param() {
+  local container=$(con_select)
+  if [[ $(con_count) -gt 1 && ! -z ${container:-} ]]; then
+    echo "--container=${container}"
+  fi
+}
+
+po_exec_con() {
+  kubectl $(ns_param) \
+    exec -it $(po_select) $(co_param) ${COMMAND:-bash}
+}
+
 # Transform long options to short ones. Sick trick.
 # http://stackoverflow.com/a/30026641/4096495
 for arg in "$@"; do
@@ -122,6 +154,11 @@ else
   ns=$(ns_current)
   echo "Namespace? (default ${ns:-default}):"; ns_number_list; read NS;
   echo 'Pod number? (default 1):'; po_number_list; read POD;
+  if [[ $(con_count) -gt 1 ]]; then
+    echo 'Container number? (default 1):'; con_number_list; read CON;
+    echo 'Command? (default bash)'; read COMMAND;
+    po_exec_con; exit 0
+  fi
   echo 'Command? (default bash)'; read COMMAND;
   po_exec
 fi
