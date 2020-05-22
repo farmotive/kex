@@ -93,7 +93,7 @@ po_select() {
 
 po_exec() {
   kubectl $(ns_param) \
-    exec -it $(po_select) ${COMMAND:-bash}
+    exec -it $(po_select) -- sh -c ${COMMAND:-bash}
 }
 
 con_list() {
@@ -125,7 +125,7 @@ co_param() {
 
 po_exec_con() {
   kubectl $(ns_param) \
-    exec -it $(po_select) $(co_param) ${COMMAND:-bash}
+    exec -it $(po_select) $(co_param) -- sh -c ${COMMAND:-bash}
 }
 
 # Transform long options to short ones. Sick trick.
@@ -156,9 +156,9 @@ else
   echo 'Pod number? (default 1):'; po_number_list; read POD;
   if [[ $(con_count) -gt 1 ]]; then
     echo 'Container number? (default 1):'; con_number_list; read CON;
-    echo 'Command? (default bash)'; read COMMAND;
+    echo 'Command? (default bash)'; IFS= read COMMAND;
     po_exec_con; exit 0
   fi
-  echo 'Command? (default bash)'; read COMMAND;
+  echo 'Command? (default bash)'; IFS= read COMMAND;
   po_exec
 fi
