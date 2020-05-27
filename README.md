@@ -66,9 +66,7 @@ MariaDB [NAME]>
 
 ## Installation
 
-**For macOS:**
-
-Use the [Homebrew](https://brew.sh/) package manager:
+**Use the [Homebrew](https://brew.sh/) package manager:**
 ```sh
 brew tap farmotive/k8s
 brew install kex
@@ -80,7 +78,7 @@ brew install kex --without-kubernetes-cli
 
 See [farmotive homebrew k8s install section](https://github.com/farmotive/homebrew-k8s#install) for more options.
 
-**Other platforms:**
+**Or simply grab the binary:**
 
 - Download the `kex` script
 - Add it somewhere in your PATH
