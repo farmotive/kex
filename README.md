@@ -2,8 +2,6 @@ The purpose of kex is to provide an opinionated executor into a kubernetes conta
 
 # kex
 
-[![asciicast](https://asciinema.org/a/OdKfqcN39sSTOkSSuFubFRl6z.png)](https://asciinema.org/a/OdKfqcN39sSTOkSSuFubFRl6z?t=21)
-
 ```sh
 kex(1)
 
